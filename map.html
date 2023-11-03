@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>Map </title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!--CSS-->
+    <link rel="stylesheet" href="asset/css/map.css"/>
+    <link rel="stylesheet" href="asset/css/styles.css"/>
+
+    <!--Leaflet Utama-->
+    <link rel="stylesheet" href="asset/leaflet/leaflet.css"/>
+    <script src="asset/leaflet/leaflet.js"></script>
+    
+    <!--JQuery-->
+    <script src="asset/jquery-3.7.1/dist/jquery.min.js"></script>
+    
+    <!--FullScreen-->
+    <link rel="stylesheet" href="asset/fullscreen/leaflet.fullscreen.css" />
+	  <script src="asset/fullscreen/Leaflet.fullscreen.min.js"></script>
+
+    <!--Lokasi-->
+    <link rel="stylesheet" href="asset/controlLocate/L.Control.Locate.min.css" />
+    <script src="asset/controlLocate/L.Control.Locate.min.js" charset="utf-8"></script>
+
+    <!--Legenda Layer-->
+    <link rel="stylesheet" href="asset/legend/leaflet.legend.css">
+    <script type="text/javascript" src="asset/legend/leaflet.legend.js"></script>
+
+    <!--Scale-->
+    <link rel="stylesheet" href="asset/leaflet-betterscale-master/L.Control.BetterScale.css" />
+  <script src="asset/leaflet-betterscale-master/L.Control.BetterScale.js"></script>
+
+    <!--ResetView-->
+    <link rel="stylesheet" href="asset/ResetView/L.Control.ResetView.min.css">
+    <script type="text/javascript" src="asset/ResetView/L.Control.ResetView.min.js"></script>
+
+  </head>
+    <body class="d-flex flex-column h-100">
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2 class="modal-title">WebGIS Jalur Pendakian Gunung Tambora</h2>
+            </div>
+            <div class="modal-title">
+              <h2 class="modal-title  justify-text">Anda dapat mengklik marker dan jalur pendakian untuk melihat informasi melalui popup, 
+                Informasi waktu tempuh dapat mengaktifkan layer waktu tempuh</h2>
+              
+            </div>
+            <div class="modal-button">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        
+      <script>
+        window.onload = function() {
+          var modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+          modal.show();
+        };
+      </script>
+
+      <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+          <div class="container">
+              <a class="navbar-brand" href="index.html">
+                  <img src="asset/img/weblogo.png" alt="Logo">
+              </a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                  <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                      <li class="nav-item"><a class="nav-link " href="index.html">Beranda</a></li>
+                      <li class="nav-item"><a class="nav-link active" href="map.html">Peta</a></li>
+                      <li class="nav-item"><a class="nav-link" href="download.html">Download Peta</a></li>
+                      <li class="nav-item"><a class="nav-link" href="informasi.html">Infromasi Jalur</a></li>
+                      <li class="nav-item"><a class="nav-link" href="about.html">Tentang</a></li>
+                  </ul>
+              </div>
+          </div>
+        </nav>
+
+      <div id="map"></div>
+      <div id="waktu-tempuh-container">
+        <h2>Waktu Tempuh</h2>
+        <div id="legenda-container"></div>
+      </div>
+      
+      
+      <!--LAYER GeoJSON -------------------------------------------------------------------------------------------------------->
+      <!--POI -->
+      <script src="asset/Data GeoJSON/POI_Jalur_Pancasila.js"></script>
+      <script src="asset/Data GeoJSON/POI_Jalur_Kawinda.js"></script>  
+      <script src="asset/Data GeoJSON/POI_Jalur_Piong.js"></script>  
+      <script src="asset/Data GeoJSON/POI_Jalur_DoroNcanga.js"></script>
+
+      <!--Jalur-->
+      <script src="asset/Data GeoJSON/Jalur_Kawinda.js"></script>
+      <script src="asset/Data GeoJSON/Jalur_Pancasila.js"></script>
+      <script src="asset/Data GeoJSON/Jalur_Piong.js"></script>
+      <script src="asset/Data GeoJSON/Jalur_DoroNcanga.js"></script>
+
+      <script>
+        //Posisi Peta
+        var map = L.map('map', {
+          fullscreenControl: true,
+          fullscreenControlOptions: { 
+            title:"Show me the fullscreen !",
+            titleCancel:"Exit fullscreen mode" 
+          },
+        }).setView([-8.2703, 117.9619], 11);
+
+        //ResetView
+        L.control.resetView({
+          position: "topleft",
+          title: "Reset view",
+          latlng: L.latLng([-8.2703, 117.9619]),
+          zoom: 11,
+        }).addTo(map);
+
+        //fullscreen
+        map.on('enterFullscreen', function(){
+          if(window.console) window.console.log('enterFullscreen');
+        });
+        map.on('exitFullscreen', function(){
+          if(window.console) window.console.log('exitFullscreen');
+        });
+
+        // Lokasi
+        L.control.locate().addTo(map);
+
+        //Scala
+        L.control.betterscale().addTo(map);
+                
+        //BaseMaps
+        var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          subdomains: ['a','b','c']
+        });   
+            
+        var ESRISatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          attribution: '&copy; <a href="https://www.esri.com/en-us/home">Esri</a>',
+          subdomains: ['a','b','c']
+        }).addTo(map);
+          
+        // Membuat layer GeoJSON
+        // POI Pendakian ---------------------------------------------------------------------------------
+        function createPOILayer(POI_data, map) {
+          return L.geoJSON(POI_data, {
+            pointToLayer: function (feature, latlng) {
+              var properties = feature.properties;
+              var iconUrl = getIconUrl(properties);
+
+              var icon = L.icon({
+                iconUrl: iconUrl,
+                iconSize: [20, 30],
+              });
+
+              return L.marker(latlng, { icon: icon });
+            },
+            onEachFeature: function (feature, layer) {
+              layer.bindTooltip(feature.properties["Nama_Lokasi"], {
+                permanent: false,
+                direction: "top",
+                opacity: 1,
+                interactive: true,
+
+                className: "custom-tooltip",
+                offset: [0, -5],           
+                minWidth: 100,             
+                maxWidth: 200,    
+                       
+              });
+
+              map.on('zoomend', function () {
+                if (map.getZoom() >= 13) {
+                  layer.openTooltip();
+                } else {
+                  layer.closeTooltip();
+                }
+              });
+            }
+          }).addTo(map);
+        }
+
+        function createPopupContent(properties) {
+          return "<img src='" + properties["Gambar"] + "' width='150px'>" + "<br>" +
+            "<strong>" + properties["Nama_Lokasi"] + "</strong><br>" +
+            "Bujur : " + properties["Bujur"] + "<br>" +
+            "Lintang : " + properties["Lintang"] + "<br>" +
+            "Elevasi (Mdpl): " + properties["Ketinggian (MDPL)"];
+        }
+
+        function getIconUrl(properties) {
+          var jenisLokasi = properties["Simbologi"];
+          if (jenisLokasi === 'Sumber Air') {
+            return 'asset/legend/Sumberair.svg';
+          } else if (jenisLokasi === 'Waypoint') {
+            return 'asset/legend/waypoint.svg';
+          } else if (jenisLokasi === 'Pos') {
+            return 'asset/legend/Poscamp.svg';
+          } else if (jenisLokasi === 'Puncak') {
+            return 'asset/legend/puncaktambora.svg';
+          } else {
+            return 'asset/legend/iconawal.svg';
+          }
+        }
+
+        var POI_Pancasila = createPOILayer(POI_Jalur_Pancasila, map);
+        POI_Pancasila.eachLayer(function (layer) {
+          var properties = layer.feature.properties;
+          var popupContent = createPopupContent(properties);
+          layer.bindPopup(popupContent);
+        });
+
+        var POI_Kawinda = createPOILayer(POI_Jalur_Kawinda, map);
+        POI_Kawinda.eachLayer(function (layer) {
+          var properties = layer.feature.properties;
+          var popupContent = createPopupContent(properties);
+          layer.bindPopup(popupContent);
+        });
+
+        var POI_Piong = createPOILayer(POI_Jalur_Piong, map);
+        POI_Piong.eachLayer(function (layer) {
+          var properties = layer.feature.properties;
+          var popupContent = createPopupContent(properties);
+          layer.bindPopup(popupContent);
+        });
+
+        var POI_DoroNcanga = createPOILayer(POI_Jalur_DoroNcanga, map);
+        POI_DoroNcanga.eachLayer(function (layer) {
+          var properties = layer.feature.properties;
+          var popupContent = createPopupContent(properties);
+          layer.bindPopup(popupContent);
+        });
+
+        //Jalur Pendakian ------------------------------------------------------------------------------------------------------
+        function createJalurLayer(geoJSONData, color) {
+          var layer = L.geoJSON(geoJSONData, {
+            style: function (feature) {
+              return {
+                color: color,
+                weight: 3,
+              };
+            }
+          }).addTo(map);
+
+          layer.eachLayer(function (layer) {
+            var properties = layer.feature.properties;
+            var popupContent = '<div style="text-align: center;">' + "<strong>" + properties["Jalur"] + "</strong><br>" +
+              "Panjang (m): " + properties["Panjang Jalur"];
+            layer.bindPopup(popupContent);
+          });
+
+          return layer;
+        }
+
+        var Pancasila = createJalurLayer(Jalur_Pancasila, '#f9172b');
+        var Kawinda = createJalurLayer(Jalur_Kawinda, '#ff6d00');
+        var Piong = createJalurLayer(Jalur_Piong, '#ffff24');
+        var DoroNcanga = createJalurLayer(Jalur_DoroNcanga, '#f72585');
+
+        // Waktu Tempuh -------------------------------------------------------------------------------------------------------------------
+       
+        function createWaktuLayer(geoJSONData) {
+          return L.geoJSON(geoJSONData, {
+            pointToLayer: function (feature, latlng) {
+              var properties = feature.properties;
+            },
+            style: function (feature) {
+              var waktuTempuhString = feature.properties["Waktu Tempuh"];
+              var waktuTempuhCleaned = parseFloat(waktuTempuhString.replace(/[^\d.]/g, ''));
+
+              if (!isNaN(waktuTempuhCleaned)) {
+                if (waktuTempuhCleaned <= 15) {
+                  return {
+                    color: '#147df5',
+                  };
+                } else if (waktuTempuhCleaned <= 30) {
+                  return {
+                    color: '#0aff99',
+                  };
+                } else if (waktuTempuhCleaned <= 45) {
+                  return {
+                    color: '#deff0a',
+                  };
+                } else if (waktuTempuhCleaned <= 60) {
+                  return {
+                    color: '#f48c06',
+                  };
+                } else {
+                  return {
+                    color: '#d90429',
+                  };
+                }
+              }
+              return {
+                color: 'dark',
+                fillColor: 'dark',
+              };
+            },
+          });
+        }
+        
+
+        function bindPopupContent(layer, properties) {
+          var popupContent = "<strong>" + properties["Jalur"] + "</strong><br>" +
+            "Waktu: " + properties["Waktu Tempuh"];
+          layer.bindPopup(popupContent);
+        }
+
+        var waktukawinda = createWaktuLayer(Jalur_Kawinda);
+        waktukawinda.eachLayer(function (layer) {
+          bindPopupContent(layer, layer.feature.properties);
+        });
+
+        var waktupancasila = createWaktuLayer(Jalur_Pancasila);
+        waktupancasila.eachLayer(function (layer) {
+          bindPopupContent(layer, layer.feature.properties);
+        });
+
+        var waktupiong = createWaktuLayer(Jalur_Piong);
+        waktupiong.eachLayer(function (layer) {
+          bindPopupContent(layer, layer.feature.properties);
+        });
+
+        var waktudoroncanga = createWaktuLayer(Jalur_DoroNcanga);
+        waktudoroncanga.eachLayer(function (layer) {
+          bindPopupContent(layer, layer.feature.properties);
+        });
+
+        
+        // Layer Control
+        var baseMaps = {
+          "Esri Satelit": ESRISatellite,
+          "OpenStreetMap": osm,   
+        };
+
+        var poiGroup = L.layerGroup([POI_Pancasila, POI_Kawinda, POI_Piong, POI_DoroNcanga]).addTo(map);
+        var jalurGroup = L.layerGroup([Kawinda, Pancasila, Piong, DoroNcanga]).addTo(map);
+        var waktuGroup = L.layerGroup([waktupancasila, waktudoroncanga, waktukawinda, waktupiong]);
+
+        var overlays = {
+          "Lokasi Penting Jalur": poiGroup,
+          "Jalur Pendakian": jalurGroup,
+          "Waktu Tempuh": waktuGroup,
+        };
+        L.control.layers(baseMaps, overlays).addTo(map);
+
+        // Buat legenda
+       const legend = L.control.Legend({
+          position: "bottomleft",
+          title: "Legenda",
+          symbolWidth: 24,
+          symbolHeight: 15,
+          opacity: 1.0,
+          column: 1,
+          collapsed: false,
+          legends: [  
+          {
+              label: "Puncak",
+              type: "image",
+              url: "asset/legend/puncaktambora.svg",
+          },{
+              label: "Pos Pendakian",
+              type: "image",
+              url: "asset/legend/Poscamp.svg",
+          },{
+              label: "Sumber Air",
+              type: "image",
+              url: "asset/legend/Sumberair.svg",
+          },{
+              label: "Waypoint",
+              type: "image",
+              url: "asset/legend/waypoint.svg",
+          },{
+            label: "Jalur Pancasila",
+            type: "polyline",
+            color: "#f9172b",
+            weight: 3,
+            layers: Pancasila
+          }, {
+            label: "Jalur Kawinda To'i",
+            type: "polyline",
+            color: "#ff6d00",
+            weight: 3,
+            layers: Kawinda
+          }, {
+            label: "Jalur Piong",
+            type: "polyline",
+            color: "#ffff24",
+            weight: 3,
+            layers: Piong
+          },{
+            label: "Jalur DoroNcanga",
+            type: "polyline",
+            color: "#f72585",
+            weight: 3,
+            layers: DoroNcanga
+          }
+        ]}).addTo(map);
+
+        // Fungsi untuk menambahkan legenda saat lapis waktu tempuh diaktifkan
+        function addLegendaToContainer() {
+          var container = document.getElementById('waktu-tempuh-container');
+          container.classList.add('active');
+        }
+
+        // Fungsi untuk menghapus legenda saat lapis waktu tempuh dinonaktifkan
+        function removeLegendaFromContainer() {
+          var container = document.getElementById('waktu-tempuh-container');
+          container.classList.remove('active');
+        }
+
+        // Fungsi untuk menambahkan informasi garis dan keterangan ke kontainer legenda
+        function addLegendaItemToContainer(label) {
+          var container = document.getElementById('legenda-container');
+          var legendaItem = document.createElement('div');
+          legendaItem.className = 'legenda-item';
+
+          var legendaLine = document.createElement('div');
+          legendaLine.className = 'legenda-line';
+          
+          var legendaLabel = document.createElement('div');
+          legendaLabel.className = 'legenda-label';
+          legendaLabel.innerText = label;
+
+          legendaItem.appendChild(legendaLine);
+          legendaItem.appendChild(legendaLabel);
+
+          container.appendChild(legendaItem);
+        }
+
+        // Menambahkan event listener untuk mengontrol kapan legenda muncul atau disembunyikan
+        waktukawinda.on('add', addLegendaToContainer);
+        waktukawinda.on('remove', removeLegendaFromContainer);
+
+        // Fungsi untuk menambahkan garis warna dan keterangan ke kontainer legenda
+        function addLegendaItemToContainer(color, label) {
+          var container = document.getElementById('legenda-container');
+          var legendaItem = document.createElement('div');
+          legendaItem.className = 'legenda-item';
+
+          var legendaLine = document.createElement('div');
+          legendaLine.className = 'legenda-line';
+          legendaLine.style.backgroundColor = color; // Atur warna garis sesuai dengan warna yang sesuai
+
+          var legendaLabel = document.createElement('div');
+          legendaLabel.className = 'legenda-label';
+          legendaLabel.innerText = label;
+
+          legendaItem.appendChild(legendaLine);
+          legendaItem.appendChild(legendaLabel);
+
+          container.appendChild(legendaItem);
+        }
+
+        // Menambahkan informasi garis dan keterangan ke kontainer legenda
+        addLegendaItemToContainer('#147df5', '<= 15 Menit');
+        addLegendaItemToContainer('#0aff99', '15 - 30 Menit');
+        addLegendaItemToContainer('#deff0a', '30 - 45 Menit');
+        addLegendaItemToContainer('#f48c06', '45 - 60 Menit');
+        addLegendaItemToContainer('#d90429', '> 60 Menit');
+
+      </script>        
+    
+      <!-- Bootstrap core JS-->
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+      <!-- Core theme JS-->
+      <script src="asset/js/scripts.js"></script>
+    </body>
+</html>
