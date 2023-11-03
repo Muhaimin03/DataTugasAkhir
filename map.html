@@ -255,7 +255,7 @@
           layer.eachLayer(function (layer) {
             var properties = layer.feature.properties;
             var popupContent = '<div style="text-align: center;">' + "<strong>" + properties["Jalur"] + "</strong><br>" +
-              "Panjang (m): " + properties["Panjang Jalur"];
+              "Panjang Jalur (m): " + properties["Panjang Jalur"];
             layer.bindPopup(popupContent);
           });
 
@@ -379,7 +379,7 @@
           },{
               label: "Waypoint",
               type: "image",
-              url: "asset/legend/waypoint.svg",
+              url: "asset/legend/Waypoint.svg",
           },{
             label: "Jalur Pancasila",
             type: "polyline",
