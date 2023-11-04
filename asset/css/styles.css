@@ -21669,3 +21669,13 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+/* styles.css */
+@media screen and (max-width: 767px) {
+  .row {
+      flex-direction: column;
+  }
+
+  .col-md-4 {
+      width: 500%;
+  }
+}

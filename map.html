@@ -19,10 +19,6 @@
     <!--JQuery-->
     <script src="asset/jquery-3.7.1/dist/jquery.min.js"></script>
     
-    <!--FullScreen-->
-    <link rel="stylesheet" href="asset/fullscreen/leaflet.fullscreen.css" />
-	  <script src="asset/fullscreen/Leaflet.fullscreen.min.js"></script>
-
     <!--Lokasi-->
     <link rel="stylesheet" href="asset/controlLocate/L.Control.Locate.min.css" />
     <script src="asset/controlLocate/L.Control.Locate.min.js" charset="utf-8"></script>
@@ -108,14 +104,9 @@
       <script src="asset/Data GeoJSON/Jalur_DoroNcanga.js"></script>
 
       <script>
+
         //Posisi Peta
-        var map = L.map('map', {
-          fullscreenControl: true,
-          fullscreenControlOptions: { 
-            title:"Show me the fullscreen !",
-            titleCancel:"Exit fullscreen mode" 
-          },
-        }).setView([-8.2703, 117.9619], 11);
+        var map = L.map('map').setView([-8.2703, 117.9619], 11);
 
         //ResetView
         L.control.resetView({
@@ -136,8 +127,7 @@
         // Lokasi
         L.control.locate().addTo(map);
 
-
-        //Scala
+        //Skala
         L.control.betterscale().addTo(map);
                 
         //BaseMaps
@@ -175,13 +165,13 @@
 
                 className: "custom-tooltip",
                 offset: [0, -5],           
-                minWidth: 100,             
-                maxWidth: 200,    
+                minWidth: 50,             
+                maxWidth: 100,    
                        
               });
 
               map.on('zoomend', function () {
-                if (map.getZoom() >= 13) {
+                if (map.getZoom() >= 14) {
                   layer.openTooltip();
                 } else {
                   layer.closeTooltip();
@@ -243,33 +233,91 @@
         });
 
         //Jalur Pendakian ------------------------------------------------------------------------------------------------------
-        function createJalurLayer(geoJSONData, color) {
-          var layer = L.geoJSON(geoJSONData, {
+        // Jalur Pendakian Pancasila ------------------------------------------------------------------------------------------------------
+        function createPancasilaLayer(geoJSONData, color) {
+          return L.geoJSON(geoJSONData, {
             style: function (feature) {
               return {
                 color: color,
                 weight: 3,
               };
+            },
+            onEachFeature: function (feature, layer) {
+              var properties = feature.properties;
+              var popupContent = '<div style="text-align: center;">' +
+                "<strong>" + properties["Jalur"] + "</strong><br>" +
+                "Jarak Tempuh: " + properties["Jarak Tempuh"] + "<br>" +
+                "Beda Tinggi (m): " + properties["Beda Tinggi"] + "<br>" +
+                "Relief Kelerengan: " + properties["Kelerengan"] + "<br>";
+              layer.bindPopup(popupContent);
             }
           }).addTo(map);
-
-          layer.eachLayer(function (layer) {
-            var properties = layer.feature.properties;
-            var popupContent = '<div style="text-align: center;">' + "<strong>" + properties["Jalur"] + "</strong><br>" +
-              "Panjang Jalur (m): " + properties["Panjang Jalur"];
-            layer.bindPopup(popupContent);
-          });
-
-          return layer;
         }
+        var Pancasila = createPancasilaLayer(Jalur_Pancasila, '#f9172b');
 
-        var Pancasila = createJalurLayer(Jalur_Pancasila, '#f9172b');
-        var Kawinda = createJalurLayer(Jalur_Kawinda, '#ff6d00');
-        var Piong = createJalurLayer(Jalur_Piong, '#ffff24');
-        var DoroNcanga = createJalurLayer(Jalur_DoroNcanga, '#f72585');
+        // Jalur Pendakian Kawinda ------------------------------------------------------------------------------------------------------
+        function createKawindaLayer(geoJSONData, color) {
+          return L.geoJSON(geoJSONData, {
+            style: function (feature) {
+              return {
+                color: color,
+                weight: 3,
+              };
+            },
+            onEachFeature: function (feature, layer) {
+              var properties = feature.properties;
+              var popupContent = '<div style="text-align: center;">' +
+                "<strong>" + properties["Jalur"] + "</strong><br>" +
+                "Jarak Tempuh: " + properties["Jarak Tempuh"] + "<br>" +
+                "Beda Tinggi (m): " + properties["Beda Tinggi"] + "<br>" +
+                "Relief Kelerengan: " + properties["Kelerengan"] + "<br>";
+              layer.bindPopup(popupContent);
+            }
+          }).addTo(map);
+        }
+        var Kawinda = createKawindaLayer(Jalur_Kawinda, '#ff6d00');
+
+        // Jalur Pendakian Piong ------------------------------------------------------------------------------------------------------
+        function createPiongLayer(geoJSONData, color) {
+          return L.geoJSON(geoJSONData, {
+            style: function (feature) {
+              return {
+                color: color,
+                weight: 3,
+              };
+            },
+            onEachFeature: function (feature, layer) {
+              var properties = feature.properties;
+              var popupContent = '<div style="text-align: center;">' +
+                "<strong>" + properties["Jalur"] + "</strong><br>" +
+                "Jarak Tempuh: " + properties["Jarak Tempuh"] + "<br>";
+              layer.bindPopup(popupContent);
+            }
+          }).addTo(map);
+        }
+        var Piong = createPiongLayer(Jalur_Piong, '#ffff24');
+
+        // Jalur Pendakian DoroNcanga ------------------------------------------------------------------------------------------------------
+        function createDoroNcangaLayer(geoJSONData, color) {
+          return L.geoJSON(geoJSONData, {
+            style: function (feature) {
+              return {
+                color: color,
+                weight: 3,
+              };
+            },
+            onEachFeature: function (feature, layer) {
+              var properties = feature.properties;
+              var popupContent = '<div style="text-align: center;">' +
+                "<strong>" + properties["Jalur"] + "</strong><br>" +
+                "Jarak Tempuh: " + properties["Jarak Tempuh"] + "<br>";
+              layer.bindPopup(popupContent);
+            }
+          }).addTo(map);
+        }
+        var DoroNcanga = createDoroNcangaLayer(Jalur_DoroNcanga, '#f72585');
 
         // Waktu Tempuh -------------------------------------------------------------------------------------------------------------------
-       
         function createWaktuLayer(geoJSONData) {
           return L.geoJSON(geoJSONData, {
             pointToLayer: function (feature, latlng) {
@@ -310,7 +358,6 @@
           });
         }
         
-
         function bindPopupContent(layer, properties) {
           var popupContent = "<strong>" + properties["Jalur"] + "</strong><br>" +
             "Waktu: " + properties["Waktu Tempuh"];
@@ -407,20 +454,17 @@
             layers: DoroNcanga
           }
         ]}).addTo(map);
+        
 
-        // Fungsi untuk menambahkan legenda saat lapis waktu tempuh diaktifkan
+        //Legenda Waktu Tempuh
         function addLegendaToContainer() {
           var container = document.getElementById('waktu-tempuh-container');
           container.classList.add('active');
         }
-
-        // Fungsi untuk menghapus legenda saat lapis waktu tempuh dinonaktifkan
         function removeLegendaFromContainer() {
           var container = document.getElementById('waktu-tempuh-container');
           container.classList.remove('active');
         }
-
-        // Fungsi untuk menambahkan informasi garis dan keterangan ke kontainer legenda
         function addLegendaItemToContainer(label) {
           var container = document.getElementById('legenda-container');
           var legendaItem = document.createElement('div');
@@ -438,12 +482,9 @@
 
           container.appendChild(legendaItem);
         }
-
-        // Menambahkan event listener untuk mengontrol kapan legenda muncul atau disembunyikan
         waktukawinda.on('add', addLegendaToContainer);
         waktukawinda.on('remove', removeLegendaFromContainer);
 
-        // Fungsi untuk menambahkan garis warna dan keterangan ke kontainer legenda
         function addLegendaItemToContainer(color, label) {
           var container = document.getElementById('legenda-container');
           var legendaItem = document.createElement('div');
@@ -451,7 +492,7 @@
 
           var legendaLine = document.createElement('div');
           legendaLine.className = 'legenda-line';
-          legendaLine.style.backgroundColor = color; // Atur warna garis sesuai dengan warna yang sesuai
+          legendaLine.style.backgroundColor = color;
 
           var legendaLabel = document.createElement('div');
           legendaLabel.className = 'legenda-label';
@@ -463,7 +504,6 @@
           container.appendChild(legendaItem);
         }
 
-        // Menambahkan informasi garis dan keterangan ke kontainer legenda
         addLegendaItemToContainer('#147df5', '<= 15 Menit');
         addLegendaItemToContainer('#0aff99', '15 - 30 Menit');
         addLegendaItemToContainer('#deff0a', '30 - 45 Menit');
