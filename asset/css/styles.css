@@ -5350,7 +5350,7 @@ textarea.form-control-lg {
 }
 
 .modal-title {
-  margin-bottom: 0;
+  margin-bottom: 5px;
   line-height: var(--bs-modal-title-line-height);
 }
 
@@ -16199,7 +16199,7 @@ textarea.form-control-lg {
 }
 
 .modal-title {
-  margin-bottom: 0;
+  margin-bottom: 5px;
   line-height: var(--bs-modal-title-line-height);
 }
 
