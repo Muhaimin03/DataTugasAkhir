@@ -51,8 +51,8 @@ body,
   border: 1px solid #ccc;
   border-radius: 5px;
   position: absolute; /* Menggunakan "fixed" agar elemen tetap di posisi yang diinginkan */
-  bottom: 25px;
-  right: 15px;
+  bottom: 65px;
+  right: 10px;
   z-index: 1000;
   display: none; /* Awalnya tersembunyi */
 }
@@ -60,7 +60,7 @@ body,
 /* Aturan responsif */
 @media (max-width: 768px) {
   #waktu-tempuh-container {
-    bottom: 25px; /* Ubah posisi bawah sesuai dengan tampilan yang lebih sempit */
+    bottom: 65px; /* Ubah posisi bawah sesuai dengan tampilan yang lebih sempit */
     right: 5px;   /* Ubah posisi kiri sesuai dengan tampilan yang lebih sempit */
   }
 }
