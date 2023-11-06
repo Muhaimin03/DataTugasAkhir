@@ -101,12 +101,45 @@ body {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
 }
+
 .navbar-brand img {
   width: 60px;
   height: 35px;
   border-radius: 10%;
   margin-right: 10px; /* Contoh: Memberikan margin kanan */
 }
+@media (max-width: 767px) {
+  .navbar-brand img {
+    width: 40px;
+    height: 25px;
+    border-radius: 10%;
+    margin-right: 5px;
+  }
+}
+#image-slider {
+  width: 100%;
+  height: 70vh; /* Sesuaikan tinggi dengan kebutuhan Anda */
+  overflow: hidden;
+  position: relative;
+}
+@media (max-width: 767px) {
+  #image-slider {
+    height: 40vh; /* Sesuaikan tinggi dengan kebutuhan Anda untuk tampilan mobile */
+  }
+}
+
+#image-slider img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  transition: opacity 1s ease-in-out;
+}
+
+#image-slider img:not(:first-child) {
+  opacity: 0;
+}
+
 
 
 hr {

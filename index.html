@@ -36,8 +36,15 @@
                     <div class="card-body p-0">
                         <div class="row gx-0">
                             <div class="col-lg-6 col-xl-7">
-                                <div class="bg-featured-blog" style="background-image: url('asset/img//Edelweiss.jpg')"></div>
-                            </div>
+                                <div class="bg-featured-blog" id="image-slider">
+                                  <img src="asset/img/Edelweiss.jpg" alt="Image 1">
+                                  <img src="asset/img/1695488595097 (1).jpg" alt="Image 2">
+                                  <img src="asset/img/1695488594190.jpg" alt="Image 3">
+                                  <img src="asset/img/1695488595186 (1).jpg" alt="Image 4">
+                                  <img src="asset/img/1695488595206.jpg" alt="Image 5">
+                                  <img src="asset/img/1695488595402.jpg" alt="Image 6">
+                                </div>
+                              </div>
                             <div class="col-lg-6 col-xl-5 py-lg-5">
                                 <div class="p-4 p-md-5">
                                     <div class="h2 fw-bolder">WebGIS Jalur Pendakian Gunung Tambora</div>
@@ -55,7 +62,19 @@
                 </div>
             </div>
         </section>
-        
+        <script>
+            const imageSlider = document.getElementById('image-slider');
+            const images = imageSlider.getElementsByTagName('img');
+            let currentImage = 0;
+
+            function changeImage() {
+            images[currentImage].style.opacity = 0;
+            currentImage = (currentImage + 1) % images.length;
+            images[currentImage].style.opacity = 1;
+            }
+
+            setInterval(changeImage, 5000);
+        </script>
        <!-- Footer-->
        <footer class="bg-dark py-4 mt-auto">
             <div class="container px-5">
