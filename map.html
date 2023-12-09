@@ -62,10 +62,10 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">
-              <h2 class="modal-title">Informasi dapat dilihat melalui popup dengan mengklik lokasi penting dan jalur pendakian</h2>
+              <h2 class="modal-title"> Informasi Terkait Jalur Pendakian dapat dilihat melalui popup dengan mengklik lokasi penting dan jalur pendakian</h2>
             </div>
             <div class="modal-title">
-              <h2 class="modal-title justify-text"><a href="panduan.html" target="_blank">Klik disini untuk panduan lengkap</a></h2>
+              <h2 class="modal-title justify-text"> Panduan Lengkap <a href="panduan.html" target="_blank"> Klik Disini </a></h2>
           </div>
           
           </div>
@@ -82,8 +82,13 @@
       <div id="map"></div>
 
       <div id="waktu-tempuh-container">
-        <h2>Waktu Tempuh</h2>
+        <h2>Waktu Tempuh <br> hiking</h2>
         <div id="legenda-container"></div>
+      </div>
+
+      <div id="waktu-tempuh-container-layer2">
+        <h2>Waktu Tempuh <br> Offroad</h2>
+        <div id="legenda-container-layer2"></div>
       </div>
       
       
@@ -137,6 +142,7 @@
           attribution: '&copy; <a href="https://www.esri.com/en-us/home">Esri</a>',
           subdomains: ['a','b','c']
         }).addTo(map);
+
           
         // Membuat layer GeoJSON
         // POI Pendakian ---------------------------------------------------------------------------------
@@ -148,7 +154,7 @@
 
               var icon = L.icon({
                 iconUrl: iconUrl,
-                iconSize: [20, 30],
+                iconSize: [15, 15],
               });
 
               return L.marker(latlng, { icon: icon });
@@ -246,6 +252,7 @@
                 "Jarak Tempuh: " + properties["Jarak Tempuh"] + "<br>" +
                 "Beda Tinggi (m): " + properties["Beda Tinggi"] + "<br>" +
                 "Relief Kelerengan: " + properties["Kelerengan"] + "<br>";
+                
               layer.bindPopup(popupContent);
             }
           }).addTo(map);
@@ -314,8 +321,8 @@
         }
         var DoroNcanga = createDoroNcangaLayer(Jalur_DoroNcanga, '#f72585');
 
-        // Waktu Tempuh -------------------------------------------------------------------------------------------------------------------
-        function createWaktuLayer(geoJSONData) {
+        // Waktu Tempuh hiking-------------------------------------------------------------------------------------------------------------------
+        function createWaktuLayerHiking(geoJSONData) {
           return L.geoJSON(geoJSONData, {
             pointToLayer: function (feature, latlng) {
               var properties = feature.properties;
@@ -327,23 +334,23 @@
               if (!isNaN(waktuTempuhCleaned)) {
                 if (waktuTempuhCleaned <= 15) {
                   return {
-                    color: '#147df5',
+                    color: '#C2D9FF',
                   };
                 } else if (waktuTempuhCleaned <= 30) {
                   return {
-                    color: '#0aff99',
+                    color: '#8E8FFA',
                   };
                 } else if (waktuTempuhCleaned <= 45) {
                   return {
-                    color: '#deff0a',
+                    color: '#7752FE',
                   };
                 } else if (waktuTempuhCleaned <= 60) {
                   return {
-                    color: '#f48c06',
+                    color: '#1640D6',
                   };
                 } else {
                   return {
-                    color: '#d90429',
+                    color: '#001B79',
                   };
                 }
               }
@@ -354,32 +361,74 @@
             },
           });
         }
-        
+
         function bindPopupContent(layer, properties) {
           var popupContent = "<strong>" + properties["Jalur"] + "</strong><br>" +
             "Waktu: " + properties["Waktu Tempuh"];
           layer.bindPopup(popupContent);
         }
 
-        var waktukawinda = createWaktuLayer(Jalur_Kawinda);
+        var waktukawinda = createWaktuLayerHiking(Jalur_Kawinda);
         waktukawinda.eachLayer(function (layer) {
           bindPopupContent(layer, layer.feature.properties);
         });
 
-        var waktupancasila = createWaktuLayer(Jalur_Pancasila);
+        var waktupancasila = createWaktuLayerHiking(Jalur_Pancasila);
         waktupancasila.eachLayer(function (layer) {
           bindPopupContent(layer, layer.feature.properties);
         });
 
-        var waktupiong = createWaktuLayer(Jalur_Piong);
+        // Waktu Tempuh offroad-------------------------------------------------------------------------------------------------------------------
+        function createWaktuLayerOffroad(geoJSONData) {
+          return L.geoJSON(geoJSONData, {
+            pointToLayer: function (feature, latlng) {
+              var properties = feature.properties;
+            },
+            style: function (feature) {
+              var waktuTempuhString = feature.properties["Waktu Tempuh"];
+              var waktuTempuhCleaned = parseFloat(waktuTempuhString.replace(/[^\d.]/g, ''));
+
+              if (!isNaN(waktuTempuhCleaned)) {
+                if (waktuTempuhCleaned <= 15) {
+                  return {
+                    color: '#F5CCA0',
+                  };
+                } else if (waktuTempuhCleaned <= 30) {
+                  return {
+                    color: '#E48F45',
+                  };
+                } else if (waktuTempuhCleaned <= 45) {
+                  return {
+                    color: '#994D1C',
+                  };
+                } else if (waktuTempuhCleaned <= 60) {
+                  return {
+                    color: '#6B240C',
+                  };
+                } else {
+                  return {
+                    color: '#D80032',
+                  };
+                }
+              }
+              return {
+                color: 'dark',
+                fillColor: 'dark',
+              };
+            },
+          });
+        }
+
+        var waktupiong = createWaktuLayerOffroad(Jalur_Piong);
         waktupiong.eachLayer(function (layer) {
           bindPopupContent(layer, layer.feature.properties);
         });
 
-        var waktudoroncanga = createWaktuLayer(Jalur_DoroNcanga);
+        var waktudoroncanga = createWaktuLayerOffroad(Jalur_DoroNcanga);
         waktudoroncanga.eachLayer(function (layer) {
           bindPopupContent(layer, layer.feature.properties);
         });
+
 
         
         // Layer Control
@@ -388,26 +437,63 @@
           "OpenStreetMap": osm,   
         };
 
-        var poiGroup = L.layerGroup([POI_Pancasila, POI_Kawinda, POI_Piong, POI_DoroNcanga]).addTo(map);
-        var jalurGroup = L.layerGroup([Kawinda, Pancasila, Piong, DoroNcanga]).addTo(map);
-        var waktuGroup = L.layerGroup([waktupancasila, waktudoroncanga, waktukawinda, waktupiong]);
+        var Hiking = L.layerGroup([POI_Pancasila, POI_Kawinda, Kawinda, Pancasila]).addTo(map);
+        var offroad = L.layerGroup([ POI_Piong, POI_DoroNcanga, Piong, DoroNcanga]).addTo(map);
+        var waktuhiking = L.layerGroup([waktupancasila, waktukawinda]);
+        var waktuoffroad = L.layerGroup([waktudoroncanga, waktupiong]);
 
+       
+
+      // Tambahkan layer waktu tempuh ke dalam objek kontrol
         var overlays = {
-          "Lokasi Penting Jalur": poiGroup,
-          "Jalur Pendakian": jalurGroup,
-          "Waktu Tempuh": waktuGroup,
+          "Jalur Hiking": Hiking,
+          "Jalur Offroad": offroad,
+          "Waktu Tempuh hiking": waktuhiking,
+          "Waktu Tempuh Offroad": waktuoffroad,
         };
-        L.control.layers(baseMaps, overlays).addTo(map);
+
+        var layerControl = L.control.layers(baseMaps, overlays).addTo(map);
+
+        // Mendengarkan perubahan pada layer waktu tempuh hiking
+        map.on('overlayadd', function (eventLayer) {
+          if (eventLayer.name === 'Waktu Tempuh hiking') {
+            // Matikan layer waktu tempuh offroad
+            layerControl.removeLayer(waktuoffroad);
+          }
+        });
+
+        map.on('overlayremove', function (eventLayer) {
+          if (eventLayer.name === 'Waktu Tempuh hiking') {
+            // Aktifkan kembali layer waktu tempuh offroad
+            layerControl.addOverlay(waktuoffroad, 'Waktu Tempuh Offroad');
+          }
+        });
+
+        // Mendengarkan perubahan pada layer waktu tempuh offroad
+        map.on('overlayadd', function (eventLayer) {
+          if (eventLayer.name === 'Waktu Tempuh Offroad') {
+            // Matikan layer waktu tempuh hiking
+            layerControl.removeLayer(waktuhiking);
+          }
+        });
+
+        map.on('overlayremove', function (eventLayer) {
+          if (eventLayer.name === 'Waktu Tempuh Offroad') {
+            // Aktifkan kembali layer waktu tempuh hiking
+            layerControl.addOverlay(waktuhiking, 'Waktu Tempuh hiking');
+          }
+        });
+
 
         // Buat legenda
-       const legend = L.control.Legend({
-          position: "bottomleft",
+        const legend = L.control.Legend({
+          position: "topleft",
           title: "Legenda",
           symbolWidth: 24,
           symbolHeight: 15,
           opacity: 1.0,
           column: 1,
-          collapsed: false,
+          collapsed: true,
           legends: [  
           {
               label: "Puncak",
@@ -453,7 +539,7 @@
         ]}).addTo(map);
         
 
-        //Legenda Waktu Tempuh
+        //Legenda Waktu Tempuh Pendakian
         function addLegendaToContainer() {
           var container = document.getElementById('waktu-tempuh-container');
           container.classList.add('active');
@@ -501,13 +587,56 @@
           container.appendChild(legendaItem);
         }
 
-        addLegendaItemToContainer('#147df5', '<= 15 Menit');
-        addLegendaItemToContainer('#0aff99', '15 - 30 Menit');
-        addLegendaItemToContainer('#deff0a', '30 - 45 Menit');
-        addLegendaItemToContainer('#f48c06', '45 - 60 Menit');
-        addLegendaItemToContainer('#d90429', '> 60 Menit');
+        addLegendaItemToContainer('#C2D9FF', '<= 15 Menit');
+        addLegendaItemToContainer('#8E8FFA', '15 - 30 Menit');
+        addLegendaItemToContainer('#7752FE', '30 - 45 Menit');
+        addLegendaItemToContainer('#1640D6', '45 - 60 Menit');
+        addLegendaItemToContainer('#001B79', '> 60 Menit');
+        
+        // Legenda Waktu Tempuh Layer 2
+        function addLegendaToContainerLayer2() {
+          var container = document.getElementById('waktu-tempuh-container-layer2');
+          container.classList.add('active');
+        }
+
+        function removeLegendaFromContainerLayer2() {
+          var container = document.getElementById('waktu-tempuh-container-layer2');
+          container.classList.remove('active');
+        }
+
+        function addLegendaItemToContainerLayer2(color, label) {
+          var container = document.getElementById('legenda-container-layer2');
+          var legendaItem = document.createElement('div');
+          legendaItem.className = 'legenda-item';
+
+          var legendaLine = document.createElement('div');
+          legendaLine.className = 'legenda-line';
+          legendaLine.style.backgroundColor = color;
+
+          var legendaLabel = document.createElement('div');
+          legendaLabel.className = 'legenda-label';
+          legendaLabel.innerText = label;
+
+          legendaItem.appendChild(legendaLine);
+          legendaItem.appendChild(legendaLabel);
+
+          container.appendChild(legendaItem);
+        }
+
+        // Assume waktulayer2 is the event emitter for the second layer
+        waktudoroncanga.on('add', addLegendaToContainerLayer2);
+        waktudoroncanga.on('remove', removeLegendaFromContainerLayer2);
+
+        // Add legend items for the second layer
+        addLegendaItemToContainerLayer2('#F5CCA0', '<= 15 Menit');
+        addLegendaItemToContainerLayer2('#E48F45', '15 - 30 Menit');
+        addLegendaItemToContainerLayer2('#994D1C', '30 - 45 Menit');
+        addLegendaItemToContainerLayer2('#6B240C', '45 - 60 Menit');
+        addLegendaItemToContainerLayer2('#D80032', '> 60 Menit');
 
       </script>        
+      
+
     <!-- Footer-->
     <footer class="bg-dark py-4 mt-auto">
       <div class="container px-5">
