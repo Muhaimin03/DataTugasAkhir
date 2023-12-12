@@ -82,7 +82,7 @@
       <div id="map"></div>
 
       <div id="waktu-tempuh-container">
-        <h2>Waktu Tempuh <br> hiking</h2>
+        <h2>Waktu Tempuh <br> Hiking</h2>
         <div id="legenda-container"></div>
       </div>
 
@@ -448,7 +448,7 @@
         var overlays = {
           "Jalur Hiking": Hiking,
           "Jalur Offroad": offroad,
-          "Waktu Tempuh hiking": waktuhiking,
+          "Waktu Tempuh Hiking": waktuhiking,
           "Waktu Tempuh Offroad": waktuoffroad,
         };
 
@@ -456,14 +456,14 @@
 
         // Mendengarkan perubahan pada layer waktu tempuh hiking
         map.on('overlayadd', function (eventLayer) {
-          if (eventLayer.name === 'Waktu Tempuh hiking') {
+          if (eventLayer.name === 'Waktu Tempuh Hiking') {
             // Matikan layer waktu tempuh offroad
             layerControl.removeLayer(waktuoffroad);
           }
         });
 
         map.on('overlayremove', function (eventLayer) {
-          if (eventLayer.name === 'Waktu Tempuh hiking') {
+          if (eventLayer.name === 'Waktu Tempuh Hiking') {
             // Aktifkan kembali layer waktu tempuh offroad
             layerControl.addOverlay(waktuoffroad, 'Waktu Tempuh Offroad');
           }
@@ -480,7 +480,7 @@
         map.on('overlayremove', function (eventLayer) {
           if (eventLayer.name === 'Waktu Tempuh Offroad') {
             // Aktifkan kembali layer waktu tempuh hiking
-            layerControl.addOverlay(waktuhiking, 'Waktu Tempuh hiking');
+            layerControl.addOverlay(waktuhiking, 'Waktu Tempuh Hiking');
           }
         });
 
