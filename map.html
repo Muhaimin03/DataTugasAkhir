@@ -91,6 +91,19 @@
         <div id="legenda-container-layer2"></div>
       </div>
       
+      <div id="legend-container-contour">
+        <h2>Interval : 50 Meter</h2>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #FF9130;"></div>
+          <div class="legend-label">Kontur Minor</div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #FF5B22;"></div>
+          <div class="legend-label">Kontur Mayor</div>
+        </div>
+      </div>
+      
+      
       
       <!--LAYER GeoJSON -------------------------------------------------------------------------------------------------------->
       <!--POI -->
@@ -104,6 +117,10 @@
       <script src="asset/Data GeoJSON/Jalur_Pancasila.js"></script>
       <script src="asset/Data GeoJSON/Jalur_Piong.js"></script>
       <script src="asset/Data GeoJSON/Jalur_DoroNcanga.js"></script>
+
+      <!--Contour-->
+      <script src="asset/Data GeoJSON/Contour.js"></script>
+
 
       <script>
 
@@ -138,13 +155,72 @@
           subdomains: ['a','b','c']
         });   
             
-        var ESRISatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        var World_Imagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
           attribution: '&copy; <a href="https://www.esri.com/en-us/home">Esri</a>',
           subdomains: ['a','b','c']
         }).addTo(map);
 
+        var topographicContour = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+          attribution: '&copy; <a href="https://www.esri.com/en-us/home">Esri</a>',
+          subdomains: ['a', 'b', 'c']
+        });
+
+
           
         // Membuat layer GeoJSON
+
+        //Contour --------------------------------
+        var Kontur = L.geoJSON(Contour, {
+          style: function (feature) {
+              var ket = feature.properties.Ket;
+              var warna;
+
+              switch (ket) {
+                  case 'Kontur Minor':
+                      warna = '#FF9130';
+                      break;
+                  case 'Kontur Mayor':
+                      warna = '#FF5B22';
+                      break;
+                  default:
+                      warna = 'gray';
+              }
+
+              return {
+                  color: warna,
+                  weight: 1,
+                  opacity: 1
+              };
+          },
+          onEachFeature: function (feature, layer) {
+              var properties = feature.properties;
+              var popupContent = 
+                "Elevasi: " + properties["ELEV"] + " Meter";
+                
+              layer.bindPopup(popupContent);
+            }
+        });
+
+        // Function to show or hide the legend container based on the active layers
+        function updateLegendVisibility() {
+          var legendContainer = document.getElementById("legend-container-contour");
+
+          // Check if the Contour layer is active
+          var isContourActive = map.hasLayer(Kontur);
+
+          // Show or hide the legend container accordingly
+          legendContainer.style.display = isContourActive ? "block" : "none";
+        }
+
+        // Event listener for layer control change
+        map.on('overlayadd overlayremove', function () {
+          updateLegendVisibility();
+        });
+
+        // Initial call to set the legend visibility based on the initial layers
+        updateLegendVisibility();
+
+
         // POI Pendakian ---------------------------------------------------------------------------------
         function createPOILayer(POI_data, map) {
           return L.geoJSON(POI_data, {
@@ -433,7 +509,8 @@
         
         // Layer Control
         var baseMaps = {
-          "Esri Satelit": ESRISatellite,
+          "World_Imagery": World_Imagery,
+          "World_Topo_Map" : topographicContour,
           "OpenStreetMap": osm,   
         };
 
@@ -443,49 +520,42 @@
         var waktuoffroad = L.layerGroup([waktudoroncanga, waktupiong]);
 
        
-
-      // Tambahkan layer waktu tempuh ke dalam objek kontrol
         var overlays = {
           "Jalur Hiking": Hiking,
           "Jalur Offroad": offroad,
+          "Garis Kontur": Kontur,
           "Waktu Tempuh Hiking": waktuhiking,
           "Waktu Tempuh Offroad": waktuoffroad,
         };
 
         var layerControl = L.control.layers(baseMaps, overlays).addTo(map);
 
-        // Mendengarkan perubahan pada layer waktu tempuh hiking
         map.on('overlayadd', function (eventLayer) {
           if (eventLayer.name === 'Waktu Tempuh Hiking') {
-            // Matikan layer waktu tempuh offroad
             layerControl.removeLayer(waktuoffroad);
           }
         });
 
         map.on('overlayremove', function (eventLayer) {
           if (eventLayer.name === 'Waktu Tempuh Hiking') {
-            // Aktifkan kembali layer waktu tempuh offroad
             layerControl.addOverlay(waktuoffroad, 'Waktu Tempuh Offroad');
           }
         });
 
-        // Mendengarkan perubahan pada layer waktu tempuh offroad
         map.on('overlayadd', function (eventLayer) {
           if (eventLayer.name === 'Waktu Tempuh Offroad') {
-            // Matikan layer waktu tempuh hiking
             layerControl.removeLayer(waktuhiking);
           }
         });
 
         map.on('overlayremove', function (eventLayer) {
           if (eventLayer.name === 'Waktu Tempuh Offroad') {
-            // Aktifkan kembali layer waktu tempuh hiking
             layerControl.addOverlay(waktuhiking, 'Waktu Tempuh Hiking');
           }
         });
 
 
-        // Buat legenda
+        // LEGENDA PETA
         const legend = L.control.Legend({
           position: "topleft",
           title: "Legenda",
@@ -538,38 +608,14 @@
           }
         ]}).addTo(map);
         
-
-        //Legenda Waktu Tempuh Pendakian
-        function addLegendaToContainer() {
-          var container = document.getElementById('waktu-tempuh-container');
-          container.classList.add('active');
+        // LEGENDA WAKTU TEMPUH
+        function toggleLegenda(containerId, isActive) {
+          var container = document.getElementById(containerId);
+          container.classList.toggle('active', isActive);
         }
-        function removeLegendaFromContainer() {
-          var container = document.getElementById('waktu-tempuh-container');
-          container.classList.remove('active');
-        }
-        function addLegendaItemToContainer(label) {
-          var container = document.getElementById('legenda-container');
-          var legendaItem = document.createElement('div');
-          legendaItem.className = 'legenda-item';
 
-          var legendaLine = document.createElement('div');
-          legendaLine.className = 'legenda-line';
-          
-          var legendaLabel = document.createElement('div');
-          legendaLabel.className = 'legenda-label';
-          legendaLabel.innerText = label;
-
-          legendaItem.appendChild(legendaLine);
-          legendaItem.appendChild(legendaLabel);
-
-          container.appendChild(legendaItem);
-        }
-        waktukawinda.on('add', addLegendaToContainer);
-        waktukawinda.on('remove', removeLegendaFromContainer);
-
-        function addLegendaItemToContainer(color, label) {
-          var container = document.getElementById('legenda-container');
+        function addLegendaItem(containerId, color, label) {
+          var container = document.getElementById(containerId);
           var legendaItem = document.createElement('div');
           legendaItem.className = 'legenda-item';
 
@@ -587,53 +633,34 @@
           container.appendChild(legendaItem);
         }
 
-        addLegendaItemToContainer('#C2D9FF', '<= 15 Menit');
-        addLegendaItemToContainer('#8E8FFA', '15 - 30 Menit');
-        addLegendaItemToContainer('#7752FE', '30 - 45 Menit');
-        addLegendaItemToContainer('#1640D6', '45 - 60 Menit');
-        addLegendaItemToContainer('#001B79', '> 60 Menit');
-        
+        function setupLegendaEvents(eventEmitter, containerId, addFunction, removeFunction) {
+          eventEmitter.on('add', function () {
+            toggleLegenda(containerId, true);
+          });
+
+          eventEmitter.on('remove', function () {
+            toggleLegenda(containerId, false);
+          });
+        }
+
+        // Legenda Waktu Tempuh Layer 1
+        setupLegendaEvents(waktukawinda, 'waktu-tempuh-container', addLegendaItem, null);
+
+        addLegendaItem('legenda-container', '#C2D9FF', '<= 15 Menit');
+        addLegendaItem('legenda-container', '#8E8FFA', '15 - 30 Menit');
+        addLegendaItem('legenda-container', '#7752FE', '30 - 45 Menit');
+        addLegendaItem('legenda-container', '#1640D6', '45 - 60 Menit');
+        addLegendaItem('legenda-container', '#001B79', '> 60 Menit');
+
         // Legenda Waktu Tempuh Layer 2
-        function addLegendaToContainerLayer2() {
-          var container = document.getElementById('waktu-tempuh-container-layer2');
-          container.classList.add('active');
-        }
+        setupLegendaEvents(waktudoroncanga, 'waktu-tempuh-container-layer2', addLegendaItem, null);
 
-        function removeLegendaFromContainerLayer2() {
-          var container = document.getElementById('waktu-tempuh-container-layer2');
-          container.classList.remove('active');
-        }
-
-        function addLegendaItemToContainerLayer2(color, label) {
-          var container = document.getElementById('legenda-container-layer2');
-          var legendaItem = document.createElement('div');
-          legendaItem.className = 'legenda-item';
-
-          var legendaLine = document.createElement('div');
-          legendaLine.className = 'legenda-line';
-          legendaLine.style.backgroundColor = color;
-
-          var legendaLabel = document.createElement('div');
-          legendaLabel.className = 'legenda-label';
-          legendaLabel.innerText = label;
-
-          legendaItem.appendChild(legendaLine);
-          legendaItem.appendChild(legendaLabel);
-
-          container.appendChild(legendaItem);
-        }
-
-        // Assume waktulayer2 is the event emitter for the second layer
-        waktudoroncanga.on('add', addLegendaToContainerLayer2);
-        waktudoroncanga.on('remove', removeLegendaFromContainerLayer2);
-
-        // Add legend items for the second layer
-        addLegendaItemToContainerLayer2('#F5CCA0', '<= 15 Menit');
-        addLegendaItemToContainerLayer2('#E48F45', '15 - 30 Menit');
-        addLegendaItemToContainerLayer2('#994D1C', '30 - 45 Menit');
-        addLegendaItemToContainerLayer2('#6B240C', '45 - 60 Menit');
-        addLegendaItemToContainerLayer2('#D80032', '> 60 Menit');
-
+        addLegendaItem('legenda-container-layer2', '#F5CCA0', '<= 15 Menit');
+        addLegendaItem('legenda-container-layer2', '#E48F45', '15 - 30 Menit');
+        addLegendaItem('legenda-container-layer2', '#994D1C', '30 - 45 Menit');
+        addLegendaItem('legenda-container-layer2', '#6B240C', '45 - 60 Menit');
+        addLegendaItem('legenda-container-layer2', '#D80032', '> 60 Menit');
+    
       </script>        
       
 

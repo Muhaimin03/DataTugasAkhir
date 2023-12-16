@@ -99,14 +99,13 @@ body,
 /* Aturan responsif */
 @media (max-width: 768px) {
   #waktu-tempuh-container-layer2 {
-    bottom: 65px; /* Ubah posisi bawah sesuai dengan tampilan yang lebih sempit */
-    right: 5px;   /* Ubah posisi kiri sesuai dengan tampilan yang lebih sempit */
+    bottom: 65px;
+    right: 5px;   
   }
 }
 
-
 #waktu-tempuh-container-layer2.active {
-  display: block; /* Muncul saat lapisan waktu tempuh dinyalakan */
+  display: block; 
 }
 
 #waktu-tempuh-container-layer2 h2 {
@@ -119,9 +118,55 @@ body,
   overflow-y: auto;
 }
 
+/* Legenda Kontur */
+#legend-container-contour {
+  background-color: #fff;
+  padding: 7px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  position: absolute; /* Menggunakan "fixed" agar elemen tetap di posisi yang diinginkan */
+  bottom: 75px;
+  left : 10px;
+  z-index: 1000;
+  display: none; /* Awalnya tersembunyi */
+}
+
+/* Aturan responsif */
+@media (max-width: 768px) {
+  #legend-container-contour {
+    bottom: 65px;
+    right: 5px;
+  }
+}
+
+#legend-container-contour.active {
+  display: block;
+}
+
+#legend-container-contour h2 {
+  font-size: 14px;
+  margin: 0 0 1px;
+}
+
+.legend-item {
+  margin-bottom: 0px;
+}
+
+.legend-color {
+  width: 20px;
+  height: 3px;
+  margin-right: 5px;
+  display: inline-block;
+}
+
+.legend-label {
+  display: inline-block;
+  font-size: 12px;
+  margin: 5px;
+}
 
 
-
+/* LEGENDA PETA */
 .legenda-item {
   display: flex;
   align-items: center;
@@ -129,8 +174,8 @@ body,
 }
 
 .legenda-line {
-  width: 20px; /* Sesuaikan dengan lebar garis yang sesuai dengan style di fungsi 'style' */
-  height: 3px; /* Sesuaikan dengan tinggi garis yang sesuai dengan style di fungsi 'style' */
+  width: 20px;
+  height: 3px;
   margin-right: 5px;
 }
 .legenda-label {
@@ -139,7 +184,7 @@ body,
 
 /* Style the modal backdrop overlay */
 .modal.fade.show {
-  background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  background: rgba(0, 0, 0, 0.5);
 }
 
 /* Style the modal content */
@@ -205,3 +250,4 @@ body,
   height: 100%;
   color: #000000;
 }
+
