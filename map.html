@@ -192,13 +192,7 @@
                   opacity: 1
               };
           },
-          onEachFeature: function (feature, layer) {
-              var properties = feature.properties;
-              var popupContent = 
-                "Elevasi: " + properties["ELEV"] + " Meter";
-                
-              layer.bindPopup(popupContent);
-            }
+        
         });
 
         // Function to show or hide the legend container based on the active layers
